@@ -26,7 +26,7 @@ app.post("/desc", async (req, res) => {
         { role: "system", content: "You are a historian who explains clearly and factually." },
         { role: "user", content: prompt }
       ],
-      max_tokens: 500,
+      max_tokens: 5000,
     });
 
     const reply = completion.choices[0].message.content;

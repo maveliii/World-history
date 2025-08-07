@@ -7,6 +7,40 @@ import type { LatLngBounds } from "leaflet";
 
 const Map = dynamic(() => import("../components/Map"), { ssr: false });
 
+function formatResult(text: string) {
+  const lines = text.split('\n');
+
+  return lines.map((line, i) => {
+    // Heading: line starts with '###'
+    if (line.startsWith('###')) {
+      const headingText = line.replace(/^###\s*/, '');
+      return (
+        <h2 key={i} className="text-yellow-600 text-3xl font-bold my-4">
+          {headingText}
+        </h2>
+      );
+    }
+
+    // Regular line: check for **bold** segments
+    const parts = line.split(/(\*\*.*?\*\*)/g); // split by **...**
+    return (
+      <p key={i} className="text-white text-lg mb-2">
+        {parts.map((part, j) => {
+          if (part.startsWith('**') && part.endsWith('**')) {
+            const content = part.slice(2, -2);
+            return (
+              <span key={j} className="font-bold text-yellow-200">
+                {content}
+              </span>
+            );
+          }
+          return <span key={j}>{part}</span>;
+        })}
+      </p>
+    );
+  });
+}
+
 export default function Home() {
   const [startYear, setStartYear] = useState("");
   const [endYear, setEndYear] = useState("");
@@ -96,14 +130,14 @@ export default function Home() {
       </div>
 
       {/* Results */}
-      <div className="p-4">
-        <h3 className="text-lg font-semibold mb-2 text-yellow-400">Result</h3>
-        {loading ? (
-          <p className="text-white animate-pulse">Loading...</p>
-        ) : (
-          <p className="text-white">{result}</p>
-        )}
-      </div>
+      <div className="p-4 px-24 justify-center">
+  {loading ? (
+    <p className="text-white animate-pulse">Loading...</p>
+  ) : (
+    <div>{formatResult(result)}</div>
+  )}
+</div>
+
     </main>
   );
 }
